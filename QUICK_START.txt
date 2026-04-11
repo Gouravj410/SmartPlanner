@@ -1,0 +1,191 @@
+╔════════════════════════════════════════════════════════════════════╗
+║              SmartPlanner v2.0 - QUICK START GUIDE                 ║
+║         Complete Full-Stack Learning Management System             ║
+╚════════════════════════════════════════════════════════════════════╝
+
+✅ YOUR PROJECT IS READY!
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 STEP 1: START THE ENTIRE PROJECT (One Command!)
+
+Open PowerShell/Terminal in this folder and run:
+
+    node start.js
+
+This will:
+  ✓ Install all dependencies
+  ✓ Create and initialize the SQLite database
+  ✓ Start the backend server
+  ✓ Serve the frontend
+  
+You'll see: "🚀 Server running at: http://localhost:3000"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🌐 STEP 2: OPEN YOUR BROWSER
+
+Once you see the server message, open:
+
+    http://localhost:3000
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 STEP 3: REGISTER OR LOGIN
+
+Option A - Create a New Account:
+  → Click "Get Started"
+  → Fill in your details (First Name, Last Name, Email, Password)
+  → You'll be redirected to login
+  → Login with your credentials
+
+Option B - Use Demo Account:
+  Email:    demo@example.com
+  Password: password123
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎓 STEP 4: USE THE APP
+
+After logging in, you'll see the ALDS v2 Dashboard with:
+  ◈ Dashboard - Overview of your progress
+  ⊞ Topics - Study materials
+  ⊡ Take Test - Adaptive tests
+  ◎ Analysis - Performance insights
+  ⊛ Decision Engine - Smart recommendations
+  ◷ Revision Schedule - Optimized study plan
+  ◉ Concept Map - Knowledge structure
+  ◌ Activity Log - Learning history
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔗 IMPORTANT URLS
+
+  Landing Page:  http://localhost:3000
+  Register:      http://localhost:3000/register.html
+  Login:         http://localhost:3000/login.html
+  Dashboard:     http://localhost:3000/index.html
+  API Base:      http://localhost:3000/api
+
+  Health Check:  http://localhost:3000/api/health (test backend)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 PROJECT STRUCTURE
+
+  📁 SmartPlanner/
+    ├── app.js                    ← Main server file
+    ├── start.js                  ← One-command startup
+    ├── package.json              ← Dependencies
+    ├── .env                      ← Configuration
+    ├── README.md                 ← Full documentation
+    │
+    ├── 📁 server/                ← Backend code
+    │   ├── routes/               ← API endpoints
+    │   ├── models/               ← Database models
+    │   ├── middleware/           ← Auth & middleware
+    │   └── config/               ← Database setup
+    │
+    ├── 📁 database/              ← Database files
+    │   └── init.js               ← Initialize DB
+    │
+    └── 📁 public/                ← Frontend (HTML/CSS/JS)
+        ├── index.html            ← Main dashboard
+        ├── login.html
+        ├── register.html
+        ├── landing.html
+        ├── css/
+        └── js/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💾 DATABASE DETAILS
+
+The system uses SQLite (smart choice for development/small projects):
+  ✓ File: database/smartplanner.db
+  ✓ Automatically created on first run
+  ✓ Stores: Users, progress, learning sessions
+  ✓ Password: Hashed with bcryptjs (secure)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔐 AUTHENTICATION SYSTEM
+
+  Frontend Stores: JWT Token in localStorage
+  Backend Uses:   JWT (30-day expiration)
+  Security:       Password hashed with bcryptjs
+  
+  Protected Routes ALL Check:
+    → Authorization: Bearer <token>
+    → Token expires → Redirect to Igin
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 DEVELOPMENT COMMANDS
+
+  npm start           Start production server
+  npm run dev         Hot reload (with nodemon)
+  npm run setup       Only initialize database
+  
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❓ TROUBLESHOOTING
+
+Port 3000 already in use?
+  → Edit .env and change PORT=3001
+
+Database issues?
+  → Delete database/smartplanner.db and rerun setup
+  
+Dependencies error?
+  → Delete node_modules folder and .env
+  → Run: npm install
+
+Token/Auth issues?
+  → Open DevTools (F12)
+  → Check Application → localStorage
+  → Verify 'token' exists after login
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 API ENDPOINTS AVAILABLE
+
+  POST   /api/auth/register      → Register new user
+  POST   /api/auth/login         → Login user
+  GET    /api/auth/me            → Get current user (needs token)
+  GET    /api/progress           → Get user progress (needs token)
+  PUT    /api/progress           → Update progress (needs token)
+  GET    /api/health             → Check server status
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ SYSTEM FEATURES
+
+  ✅ User Authentication (Secure JWT)
+  ✅ User Progress Tracking
+  ✅ Adaptive Learning System
+  ✅ Smart Performance Analysis
+  ✅ Concept Mapping
+  ✅ Revision Scheduling
+  ✅ Decision Engine
+  ✅ Activity Logging
+  ✅ Dark Theme UI (Modern Design)
+  ✅ Responsive Design
+  ✅ Full backend with SQLite
+  ✅ Complete API
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 YOU'RE ALL SET!
+
+Run this command to get started:
+
+    node start.js
+
+Then open: http://localhost:3000
+
+Questions? Check the README.md file for detailed documentation.
+
+Happy Learning! 🚀
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

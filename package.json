@@ -1,0 +1,25 @@
+{
+  "name": "smartplanner",
+  "version": "2.0.0",
+  "description": "Adaptive Learning Decision System with Backend",
+  "main": "app.js",
+  "scripts": {
+    "start": "node start.js",
+    "dev": "nodemon app.js",
+    "setup": "node database/init.js",
+    "server": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6",
+    "sqlite": "^5.0.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "body-parser": "^1.20.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}

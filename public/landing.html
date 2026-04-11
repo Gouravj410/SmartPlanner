@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartPlanner — Adaptive Learning System</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg0: #07080d; --bg1: #0d0f18; --bg2: #131620; --bg3: #1a1d2b; --bg4: #222638;
+      --line: rgba(255,255,255,0.06); --line2: rgba(255,255,255,0.11); --line3: rgba(255,255,255,0.18);
+      --t1: #f0eeff; --t2: #9896b8; --t3: #55536e; --t4: #35334a;
+      --ink: #7b6ff0; --ink2: #5a4fd6; --inkglow: rgba(123,111,240,0.12);
+      --go: #34d89b; --go2: rgba(52,216,155,0.1);
+      --r: 10px; --rs: 7px;
+      --mono: 'JetBrains Mono', monospace; --sans: 'Plus Jakarta Sans', sans-serif;
+      --transition: 0.18s cubic-bezier(.4,0,.2,1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: linear-gradient(135deg, var(--bg0) 0%, var(--bg1) 100%); color: var(--t1); font-family: var(--sans); min-height: 100vh; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 40px; border-bottom: 1px solid var(--line); background: rgba(13,15,24,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 100; }
+    .nav-brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; }
+    .nav-badge { font-size: 8px; font-weight: 700; color: var(--ink); font-family: var(--mono); }
+    .nav-links { display: flex; gap: 16px; }
+    .nav-link { padding: 8px 16px; border-radius: var(--rs); text-decoration: none; font-size: 13px; font-weight: 600; color: var(--t2); transition: var(--transition); border: 1px solid transparent; }
+    .nav-link:hover { color: var(--t1); border-color: var(--line2); }
+    .nav-link.primary { background: var(--ink); color: #fff; }
+    .nav-link.primary:hover { background: var(--ink2); }
+    .hero { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: calc(100vh - 60px); padding: 60px 40px; text-align: center; }
+    .hero-content { max-width: 700px; margin-bottom: 50px; }
+    .hero-badge { display: inline-block; font-size: 9px; font-weight: 700; color: var(--ink); font-family: var(--mono); padding: 6px 12px; background: var(--inkglow); border-radius: 20px; margin-bottom: 16px; }
+    .hero-title { font-size: 52px; font-weight: 800; background: linear-gradient(135deg, var(--t1) 0%, var(--ink) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 16px; }
+    .hero-subtitle { font-size: 18px; color: var(--t2); line-height: 1.6; margin-bottom: 32px; }
+    .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 80px; }
+    .btn { padding: 14px 32px; border-radius: var(--rs); border: none; font-weight: 600; font-size: 14px; cursor: pointer; transition: var(--transition); font-family: var(--sans); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: var(--ink2); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(123,111,240,0.3); }
+    .btn-secondary { background: transparent; color: var(--t1); border: 1.5px solid var(--line2); }
+    .btn-secondary:hover { border-color: var(--ink); color: var(--ink); background: var(--inkglow); }
+    .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 60px; padding: 0 40px 80px; max-width: 1200px; margin: 60px auto 80px; }
+    .feature-card { background: var(--bg1); border: 1px solid var(--line); border-radius: var(--r); padding: 28px 24px; transition: var(--transition); }
+    .feature-card:hover { border-color: var(--ink); background: var(--bg2); transform: translateY(-4px); }
+    .feature-icon { font-size: 28px; margin-bottom: 12px; }
+    .feature-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .feature-desc { font-size: 13px; color: var(--t3); line-height: 1.6; }
+    .footer { display: flex; justify-content: space-between; align-items: center; padding: 24px 40px; border-top: 1px solid var(--line); background: var(--bg1); font-size: 12px; color: var(--t3); flex-wrap: wrap; gap: 20px; }
+    .footer a { color: var(--ink); text-decoration: none; transition: var(--transition); }
+    .footer a:hover { color: var(--ink2); }
+    @media (max-width: 768px) { .hero-title { font-size: 36px; } .btn { width: 100%; justify-content: center; } }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span>SmartPlanner</span>
+      <span class="nav-badge">v2.0</span>
+    </div>
+    <div class="nav-links">
+      <a href="register.html" class="nav-link">Register</a>
+      <a href="login.html" class="nav-link primary">Sign In</a>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">Adaptive Learning System</div>
+      <h1 class="hero-title">Learn Smarter, Not Harder</h1>
+      <p class="hero-subtitle">SmartPlanner uses advanced AI to personalize your learning journey, identify weak spots, and create optimal revision schedules tailored to your needs.</p>
+    </div>
+
+    <div class="cta-group">
+      <a href="register.html" class="btn btn-primary">Get Started</a>
+      <a href="login.html" class="btn btn-secondary">Already have an account</a>
+    </div>
+
+    <div class="features">
+      <div class="feature-card"><div class="feature-icon">◈</div><h3 class="feature-title">Adaptive Learning</h3><p class="feature-desc">Real-time difficulty adjustment based on your performance.</p></div>
+      <div class="feature-card"><div class="feature-icon">◎</div><h3 class="feature-title">Smart Analysis</h3><p class="feature-desc">Detailed insights into your learning patterns and progress.</p></div>
+      <div class="feature-card"><div class="feature-icon">◷</div><h3 class="feature-title">Revision Schedule</h3><p class="feature-desc">AI-generated schedules that optimize retention.</p></div>
+      <div class="feature-card"><div class="feature-icon">◉</div><h3 class="feature-title">Concept Mapping</h3><p class="feature-desc">Visual representation of your knowledge structure.</p></div>
+      <div class="feature-card"><div class="feature-icon">⊛</div><h3 class="feature-title">Decision Engine</h3><p class="feature-desc">Intelligent recommendations on what to study next.</p></div>
+      <div class="feature-card"><div class="feature-icon">◌</div><h3 class="feature-title">Activity Log</h3><p class="feature-desc">Complete history of your learning activities.</p></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div>© 2026 SmartPlanner. All rights reserved.</div>
+    <div style="display: flex; gap: 20px;">
+      <a href="#privacy">Privacy Policy</a>
+      <a href="#terms">Terms of Service</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </footer>
+
+  <script src="js/api.js"></script>
+  <script>
+    if (APIService.isAuthenticated()) {
+      window.location.href = 'index.html';
+    }
+  </script>
+</body>
+</html>

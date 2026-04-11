@@ -1,585 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ALDS v2 — Adaptive Learning Decision System</title>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<style>
-/* ═══════════════════════════════════════════
-   DESIGN TOKENS
-═══════════════════════════════════════════ */
-:root {
-  --bg0: #07080d;
-  --bg1: #0d0f18;
-  --bg2: #131620;
-  --bg3: #1a1d2b;
-  --bg4: #222638;
-  --line: rgba(255,255,255,0.06);
-  --line2: rgba(255,255,255,0.11);
-  --line3: rgba(255,255,255,0.18);
-  --t1: #f0eeff;
-  --t2: #9896b8;
-  --t3: #55536e;
-  --t4: #35334a;
-  --ink: #7b6ff0;
-  --ink2: #5a4fd6;
-  --inkglow: rgba(123,111,240,0.12);
-  --go: #34d89b;
-  --go2: rgba(52,216,155,0.1);
-  --warn: #f0b429;
-  --warn2: rgba(240,180,41,0.1);
-  --stop: #f05a7b;
-  --stop2: rgba(240,90,123,0.1);
-  --sky: #4da8f0;
-  --sky2: rgba(77,168,240,0.1);
-  --r: 10px;
-  --rs: 7px;
-  --mono: 'JetBrains Mono', monospace;
-  --sans: 'Plus Jakarta Sans', sans-serif;
-  --transition: 0.18s cubic-bezier(.4,0,.2,1);
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; scroll-behavior: smooth; }
-body { background: var(--bg0); color: var(--t1); font-family: var(--sans); min-height: 100vh; overflow: hidden; }
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-thumb { background: var(--bg4); border-radius: 3px; }
-
-/* ═══════════════════════════════════════════
-   LAYOUT SHELL
-═══════════════════════════════════════════ */
-.shell { display: flex; height: 100vh; }
-.sidebar { width: 240px; min-width: 240px; background: var(--bg1); border-right: 1px solid var(--line); display: flex; flex-direction: column; overflow: hidden; }
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-.topbar { height: 52px; min-height: 52px; background: var(--bg1); border-bottom: 1px solid var(--line); display: flex; align-items: center; padding: 0 22px; gap: 12px; }
-.pane { flex: 1; overflow-y: auto; padding: 24px; }
-
-/* ═══════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════ */
-.sb-brand { padding: 18px 16px 14px; border-bottom: 1px solid var(--line); }
-.sb-badge { font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--ink); font-family: var(--mono); margin-bottom: 3px; }
-.sb-name { font-size: 15px; font-weight: 800; }
-.sb-nav { flex: 1; padding: 10px 8px; overflow-y: auto; }
-.sb-group { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--t4); padding: 12px 8px 5px; font-family: var(--mono); }
-.nav-item { display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: var(--rs); cursor: pointer; font-size: 13px; font-weight: 500; color: var(--t3); transition: var(--transition); margin-bottom: 1px; }
-.nav-item:hover { background: var(--bg3); color: var(--t2); }
-.nav-item.active { background: var(--inkglow); color: var(--ink); }
-.nav-item .ni { font-size: 12px; width: 16px; text-align: center; opacity: .7; }
-.nav-badge { margin-left: auto; font-size: 9px; font-weight: 700; font-family: var(--mono); padding: 1px 6px; border-radius: 20px; }
-.nav-badge.red { background: var(--stop2); color: var(--stop); }
-.nav-badge.amber { background: var(--warn2); color: var(--warn); }
-.sb-foot { padding: 12px; border-top: 1px solid var(--line); }
-.student-pill { display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: var(--bg3); border-radius: var(--rs); }
-.ava { width: 28px; height: 28px; border-radius: 50%; background: linear-gradient(135deg,#7b6ff0,#c471ed); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: #fff; flex-shrink: 0; }
-.stu-n { font-size: 12px; font-weight: 700; }
-.stu-s { font-size: 10px; color: var(--t3); margin-top: 1px; }
-
-/* ═══════════════════════════════════════════
-   TOPBAR
-═══════════════════════════════════════════ */
-.tb-title { font-size: 13px; font-weight: 700; flex: 1; }
-.chip { font-size: 10px; font-weight: 700; font-family: var(--mono); padding: 3px 9px; border-radius: 20px; border: 1px solid var(--line2); background: var(--bg3); color: var(--t3); white-space: nowrap; }
-.chip.go { border-color: var(--go); color: var(--go); background: var(--go2); }
-.chip.warn { border-color: var(--warn); color: var(--warn); background: var(--warn2); }
-.chip.stop { border-color: var(--stop); color: var(--stop); background: var(--stop2); }
-.chip.ink { border-color: var(--ink); color: var(--ink); background: var(--inkglow); }
-.alert-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--stop); animation: blink 2s ease-in-out infinite; }
-@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
-
-/* ═══════════════════════════════════════════
-   VIEWS
-═══════════════════════════════════════════ */
-.view { display: none; }
-.view.active { display: block; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
-.fadein { animation: fadeUp .25s ease forwards; }
-
-/* ═══════════════════════════════════════════
-   CARDS & GRIDS
-═══════════════════════════════════════════ */
-.card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r); padding: 18px 20px; }
-.card-h { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--t4); font-family: var(--mono); margin-bottom: 12px; }
-.g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-.g4 { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; }
-.gap { display: flex; flex-direction: column; gap: 14px; }
-.page-title { font-size: 20px; font-weight: 800; margin-bottom: 3px; }
-.page-sub { font-size: 12px; color: var(--t3); margin-bottom: 20px; line-height: 1.5; }
-
-/* ═══════════════════════════════════════════
-   STAT CARDS
-═══════════════════════════════════════════ */
-.stat { padding: 14px 16px; }
-.stat-l { font-size: 9px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--t4); font-family: var(--mono); margin-bottom: 5px; }
-.stat-v { font-size: 26px; font-weight: 800; line-height: 1; }
-.stat-s { font-size: 11px; color: var(--t3); margin-top: 3px; }
-
-/* ═══════════════════════════════════════════
-   DECISION PANEL
-═══════════════════════════════════════════ */
-.decision-panel { background: var(--bg2); border-radius: var(--r); padding: 20px 22px; margin-bottom: 18px; position: relative; overflow: hidden; }
-.dp-green { border: 1px solid var(--go); }
-.dp-green::before { content:''; position:absolute;inset:0; background:radial-gradient(ellipse at top left,rgba(52,216,155,.07),transparent 60%); pointer-events:none; }
-.dp-amber { border: 1px solid var(--warn); }
-.dp-amber::before { content:''; position:absolute;inset:0; background:radial-gradient(ellipse at top left,rgba(240,180,41,.07),transparent 60%); pointer-events:none; }
-.dp-stop { border: 1px solid var(--stop); }
-.dp-stop::before { content:''; position:absolute;inset:0; background:radial-gradient(ellipse at top left,rgba(240,90,123,.07),transparent 60%); pointer-events:none; }
-.dp-ink { border: 1px solid var(--ink); }
-.dp-ink::before { content:''; position:absolute;inset:0; background:radial-gradient(ellipse at top left,rgba(123,111,240,.1),transparent 60%); pointer-events:none; }
-.dp-tag { font-size: 9px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; font-family: var(--mono); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
-.dp-tag::before { content:''; width:5px; height:5px; border-radius:50%; flex-shrink:0; animation: blink 2s infinite; }
-.dp-tag.go { color: var(--go); } .dp-tag.go::before { background: var(--go); }
-.dp-tag.amber { color: var(--warn); } .dp-tag.amber::before { background: var(--warn); }
-.dp-tag.stop { color: var(--stop); } .dp-tag.stop::before { background: var(--stop); }
-.dp-tag.ink { color: var(--ink); } .dp-tag.ink::before { background: var(--ink); }
-.dp-headline { font-size: 17px; font-weight: 800; line-height: 1.35; margin-bottom: 7px; }
-.dp-reason { font-size: 12px; color: var(--t2); line-height: 1.7; margin-bottom: 14px; }
-
-/* ═══════════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════════ */
-.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--rs); font-family: var(--sans); font-size: 12px; font-weight: 700; cursor: pointer; border: none; transition: var(--transition); }
-.btn-ink { background: var(--ink); color: #fff; } .btn-ink:hover { background: #9d93f7; }
-.btn-go { background: var(--go2); color: var(--go); border: 1px solid var(--go); } .btn-go:hover { background: rgba(52,216,155,.2); }
-.btn-ghost { background: transparent; color: var(--t3); border: 1px solid var(--line2); } .btn-ghost:hover { background: var(--bg3); color: var(--t2); }
-.btn-stop { background: var(--stop2); color: var(--stop); border: 1px solid var(--stop); }
-.btn-warn { background: var(--warn2); color: var(--warn); border: 1px solid var(--warn); }
-.brow { display: flex; gap: 8px; flex-wrap: wrap; }
-
-/* ═══════════════════════════════════════════
-   MASTERY BAR
-═══════════════════════════════════════════ */
-.mbar { height: 3px; background: var(--bg4); border-radius: 2px; }
-.mfill { height: 100%; border-radius: 2px; transition: width .6s cubic-bezier(.4,0,.2,1); }
-.mfill.strong { background: var(--go); }
-.mfill.moderate { background: var(--warn); }
-.mfill.weak { background: var(--stop); }
-
-.ctag { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 20px; font-family: var(--mono); }
-.ctag.strong { background: var(--go2); color: var(--go); }
-.ctag.moderate { background: var(--warn2); color: var(--warn); }
-.ctag.weak { background: var(--stop2); color: var(--stop); }
-.ctag.new { background: var(--sky2); color: var(--sky); }
-
-/* ═══════════════════════════════════════════
-   CONCEPT ROWS
-═══════════════════════════════════════════ */
-.crow { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
-.crow:last-child { border: none; }
-.cname { font-size: 12px; font-weight: 500; flex: 1; min-width: 0; }
-.cpct { font-size: 11px; font-family: var(--mono); color: var(--t3); min-width: 32px; text-align: right; }
-
-/* ═══════════════════════════════════════════
-   TEST ENGINE
-═══════════════════════════════════════════ */
-.q-card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r); padding: 22px 24px; }
-.q-meta { display: flex; gap: 7px; align-items: center; margin-bottom: 11px; }
-.q-num { font-size: 10px; font-family: var(--mono); color: var(--t4); font-weight: 600; }
-.q-con { font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: var(--sky2); color: var(--sky); font-family: var(--mono); }
-.q-text { font-size: 14px; font-weight: 600; line-height: 1.55; margin-bottom: 16px; }
-.q-opts { display: flex; flex-direction: column; gap: 7px; }
-.opt { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: var(--rs); border: 1px solid var(--line); cursor: pointer; transition: var(--transition); font-size: 12px; font-weight: 500; }
-.opt:hover:not(.locked) { border-color: var(--ink); background: var(--inkglow); }
-.opt.correct { border-color: var(--go) !important; background: var(--go2) !important; color: var(--go) !important; }
-.opt.wrong { border-color: var(--stop) !important; background: var(--stop2) !important; color: var(--stop) !important; }
-.opt.locked { pointer-events: none; }
-.opt-key { width: 20px; height: 20px; border-radius: 50%; background: var(--bg4); border: 1px solid var(--line2); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; font-family: var(--mono); flex-shrink: 0; }
-.timer-strip { height: 2px; background: var(--bg4); border-radius: 1px; margin-bottom: 18px; }
-.timer-fill { height: 100%; border-radius: 1px; transition: width 1s linear, background .3s; }
-.progress-dots { display: flex; gap: 6px; margin-bottom: 18px; }
-.pdot { width: 20px; height: 4px; border-radius: 2px; background: var(--bg4); transition: var(--transition); }
-.pdot.done-right { background: var(--go); }
-.pdot.done-wrong { background: var(--stop); }
-.pdot.current { background: var(--ink); }
-
-/* ═══════════════════════════════════════════
-   ANALYSIS
-═══════════════════════════════════════════ */
-.mistake-card { background: var(--bg2); border: 1px solid var(--stop); border-radius: var(--r); padding: 16px 18px; margin-bottom: 10px; }
-.m-why { margin-top: 11px; padding: 10px 12px; background: rgba(240,90,123,.05); border-left: 2px solid var(--stop); border-radius: 0 var(--rs) var(--rs) 0; }
-.m-why-h { font-size: 9px; font-weight: 700; letter-spacing: .1em; color: var(--stop); font-family: var(--mono); margin-bottom: 5px; }
-.m-why-t { font-size: 12px; color: var(--t2); line-height: 1.6; }
-.etag { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: var(--mono); margin-top: 7px; display: inline-block; }
-.etag.guess { background: var(--warn2); color: var(--warn); }
-.etag.concept { background: var(--stop2); color: var(--stop); }
-.etag.calc { background: var(--sky2); color: var(--sky); }
-.etag.anomaly { background: var(--inkglow); color: var(--ink); }
-.correct-row { display: flex; align-items: center; gap: 8px; padding: 7px 10px; background: var(--go2); border-radius: var(--rs); font-size: 12px; color: var(--go); margin-bottom: 10px; border: 1px solid rgba(52,216,155,.2); }
-
-/* ═══════════════════════════════════════════
-   HEATMAP
-═══════════════════════════════════════════ */
-.hmap { display: flex; gap: 6px; flex-wrap: wrap; }
-.hcell { width: 36px; height: 36px; border-radius: var(--rs); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; font-family: var(--mono); cursor: pointer; transition: transform .15s; border: 1px solid transparent; }
-.hcell:hover { transform: scale(1.1); }
-
-/* ═══════════════════════════════════════════
-   DECISION TREE NODES
-═══════════════════════════════════════════ */
-.dtree-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
-.dtree-row:last-child { border: none; }
-.dtree-icon { width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 800; margin-top: 1px; }
-.dtree-label { font-size: 12px; font-weight: 600; margin-bottom: 2px; }
-.dtree-detail { font-size: 11px; color: var(--t3); line-height: 1.5; font-family: var(--mono); }
-
-/* ═══════════════════════════════════════════
-   SCHEDULE
-═══════════════════════════════════════════ */
-.sched-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-.sched-item:last-child { border: none; }
-.sched-cal { min-width: 42px; background: var(--bg3); border-radius: var(--rs); padding: 5px 3px; text-align: center; }
-.sched-day { font-size: 17px; font-weight: 800; line-height: 1; }
-.sched-mon { font-size: 9px; font-family: var(--mono); color: var(--t4); font-weight: 600; }
-.sched-info { flex: 1; min-width: 0; }
-.sched-topic { font-size: 12px; font-weight: 700; }
-.sched-sub { font-size: 11px; color: var(--t3); margin-top: 1px; }
-.sched-rule { font-size: 10px; font-family: var(--mono); color: var(--t4); margin-top: 3px; }
-.urgency { font-size: 9px; font-weight: 700; padding: 2px 8px; border-radius: 20px; font-family: var(--mono); flex-shrink: 0; }
-
-/* ═══════════════════════════════════════════
-   SPARKLINE
-═══════════════════════════════════════════ */
-.spark { display: flex; align-items: flex-end; gap: 3px; height: 48px; }
-.sbar { flex: 1; border-radius: 2px 2px 0 0; min-width: 6px; transition: height .5s cubic-bezier(.4,0,.2,1); }
-
-/* ═══════════════════════════════════════════
-   TABS
-═══════════════════════════════════════════ */
-.tabs { display: flex; gap: 2px; background: var(--bg3); padding: 3px; border-radius: var(--rs); width: fit-content; margin-bottom: 16px; }
-.tab { font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 5px; cursor: pointer; color: var(--t3); transition: var(--transition); }
-.tab.active { background: var(--bg2); color: var(--t1); }
-
-/* ═══════════════════════════════════════════
-   RULE TABLE
-═══════════════════════════════════════════ */
-.rule-row { display: flex; gap: 12px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
-.rule-row:last-child { border: none; }
-.rule-if { font-size: 11px; font-family: var(--mono); color: var(--t3); flex: 1; }
-.rule-then { font-size: 11px; font-weight: 700; min-width: 160px; }
-
-/* ═══════════════════════════════════════════
-   INFO BOX
-═══════════════════════════════════════════ */
-.infobox { background: var(--bg3); border: 1px solid var(--line2); border-radius: var(--rs); padding: 12px 14px; font-size: 12px; color: var(--t2); line-height: 1.7; }
-
-/* ═══════════════════════════════════════════
-   ONBOARDING OVERLAY
-═══════════════════════════════════════════ */
-#onboarding { position: fixed; inset: 0; background: rgba(7,8,13,.96); z-index: 999; display: flex; align-items: center; justify-content: center; }
-.ob-card { background: var(--bg2); border: 1px solid var(--line2); border-radius: 16px; padding: 36px 40px; max-width: 440px; width: 90%; text-align: center; }
-.ob-logo { font-size: 10px; font-weight: 700; letter-spacing: .14em; color: var(--ink); font-family: var(--mono); margin-bottom: 8px; }
-.ob-title { font-size: 24px; font-weight: 800; margin-bottom: 8px; }
-.ob-sub { font-size: 13px; color: var(--t3); line-height: 1.6; margin-bottom: 28px; }
-.ob-input { width: 100%; background: var(--bg3); border: 1px solid var(--line2); color: var(--t1); border-radius: var(--rs); padding: 10px 14px; font-family: var(--sans); font-size: 13px; outline: none; margin-bottom: 10px; }
-.ob-input:focus { border-color: var(--ink); }
-select.ob-input { cursor: pointer; }
-
-/* ═══════════════════════════════════════════
-   RECOVERY BANNER
-═══════════════════════════════════════════ */
-.recovery-banner { background: var(--bg2); border: 1px solid var(--warn); border-radius: var(--r); padding: 18px 20px; margin-bottom: 16px; position: relative; overflow: hidden; display: none; }
-.recovery-banner::before { content:''; position:absolute;inset:0; background:radial-gradient(ellipse at top left,rgba(240,180,41,.07),transparent 55%); pointer-events:none; }
-.recovery-banner.visible { display: block; }
-
-/* ═══════════════════════════════════════════
-   ANOMALY BANNER
-═══════════════════════════════════════════ */
-.anomaly-banner { background: var(--bg2); border: 1px solid var(--ink); border-radius: var(--r); padding: 14px 16px; margin-bottom: 14px; font-size: 12px; display: none; }
-.anomaly-banner.visible { display: flex; gap: 10px; align-items: flex-start; }
-
-/* ═══════════════════════════════════════════
-   TOPICS GRID
-═══════════════════════════════════════════ */
-.topic-card { background: var(--bg2); border: 1px solid var(--line); border-radius: var(--r); padding: 16px 18px; cursor: pointer; transition: var(--transition); }
-.topic-card:hover { border-color: var(--ink); transform: translateY(-1px); }
-.topic-card.locked { opacity: .5; cursor: not-allowed; }
-.topic-icon { font-size: 20px; margin-bottom: 7px; }
-.topic-name { font-size: 13px; font-weight: 800; margin-bottom: 3px; }
-.topic-sub { font-size: 11px; color: var(--t3); line-height: 1.4; }
-.topic-bar-wrap { margin-top: 10px; }
-
-/* ═══════════════════════════════════════════
-   ACTIVITY LOG
-═══════════════════════════════════════════ */
-.arow { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); align-items: flex-start; }
-.arow:last-child { border: none; }
-.adot { width: 7px; height: 7px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
-.atime { font-size: 10px; font-family: var(--mono); color: var(--t4); min-width: 58px; }
-.atext { font-size: 12px; color: var(--t2); line-height: 1.5; }
-
-/* ═══════════════════════════════════════════
-   CONFIDENCE INDICATOR
-═══════════════════════════════════════════ */
-.conf-ring { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
-.conf-num { font-size: 20px; font-weight: 800; line-height: 1; }
-.conf-label { font-size: 9px; font-family: var(--mono); color: var(--t4); text-transform: uppercase; letter-spacing: .1em; }
-
-/* ─ tooltip ─ */
-[data-tip] { position: relative; cursor: help; }
-[data-tip]::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 5px); left: 50%; transform: translateX(-50%); background: var(--bg4); color: var(--t2); font-size: 10px; padding: 4px 8px; border-radius: 5px; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity .15s; border: 1px solid var(--line2); z-index: 50; }
-[data-tip]:hover::after { opacity: 1; }
-</style>
-</head>
-<body>
-
-<!-- ═══════════════ ONBOARDING MODAL ═══════════════ -->
-<div id="onboarding">
-  <div class="ob-card">
-    <div class="ob-logo">ALDS v2.0 — ADAPTIVE LEARNING ENGINE</div>
-    <div class="ob-title">Let's set you up.</div>
-    <div class="ob-sub">Tell me who you are and what you're studying. The system will track your concepts, find your weak spots, and tell you exactly what to do next.</div>
-    <input class="ob-input" id="ob-name" placeholder="Your name" maxlength="30">
-    <select class="ob-input" id="ob-subject">
-      <option value="Physics">Physics — Mechanics</option>
-      <option value="Math">Mathematics — Calculus</option>
-      <option value="Chemistry">Chemistry — Reactions</option>
-    </select>
-    <select class="ob-input" id="ob-level">
-      <option value="beginner">Beginner</option>
-      <option value="intermediate">Intermediate</option>
-      <option value="advanced">Advanced</option>
-    </select>
-    <button class="btn btn-ink" style="width:100%;justify-content:center;margin-top:8px;font-size:13px;padding:11px" onclick="startSystem()">Start Learning →</button>
-  </div>
-</div>
-
-<!-- ═══════════════ MAIN SHELL ═══════════════ -->
-<div class="shell">
-
-  <!-- SIDEBAR -->
-  <aside class="sidebar">
-    <div class="sb-brand">
-      <div class="sb-badge">ALDS v2.0</div>
-      <div class="sb-name">Learning Engine</div>
-    </div>
-    <nav class="sb-nav">
-      <div class="sb-group">Core</div>
-      <div class="nav-item active" onclick="nav('dashboard')"><span class="ni">◈</span>Dashboard</div>
-      <div class="nav-item" onclick="nav('topics')"><span class="ni">⊞</span>Topics</div>
-      <div class="nav-item" id="nav-test" onclick="nav('test')"><span class="ni">⊡</span>Take Test</div>
-      <div class="sb-group">Intelligence</div>
-      <div class="nav-item" onclick="nav('analysis')"><span class="ni">◎</span>Analysis<span class="nav-badge amber" id="nb-analysis" style="display:none">NEW</span></div>
-      <div class="nav-item" onclick="nav('decision')"><span class="ni">⊛</span>Decision Engine</div>
-      <div class="nav-item" onclick="nav('schedule')"><span class="ni">◷</span>Revision Schedule<span class="nav-badge red" id="nb-schedule">3</span></div>
-      <div class="sb-group">Memory</div>
-      <div class="nav-item" onclick="nav('concepts')"><span class="ni">◉</span>Concept Map</div>
-      <div class="nav-item" onclick="nav('activity')"><span class="ni">◌</span>Activity Log</div>
-    </nav>
-    <div class="sb-foot">
-      <div class="student-pill">
-        <div class="ava" id="sb-ava">A</div>
-        <div>
-          <div class="stu-n" id="sb-name-disp">Student</div>
-          <div class="stu-s" id="sb-streak">🔥 0 day streak</div>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN -->
-  <div class="main">
-    <div class="topbar">
-      <div class="tb-title" id="tb-title">Dashboard</div>
-      <div class="chip" id="chip-topic">Physics</div>
-      <div class="chip" id="chip-mastery">Mastery —</div>
-      <div class="chip go" id="chip-streak">Day 0</div>
-      <div class="alert-dot" id="alert-dot" style="display:none" data-tip="Action required"></div>
-    </div>
-
-    <div class="pane">
-
-      <!-- ══════════════ DASHBOARD ══════════════ -->
-      <div id="view-dashboard" class="view active fadein">
-        <div class="page-title" id="dash-greeting">Good day 👋</div>
-        <div class="page-sub">Here's exactly where you stand and what to do next.</div>
-
-        <!-- Recovery Banner -->
-        <div class="recovery-banner" id="recovery-banner">
-          <div style="font-size:9px;font-weight:700;letter-spacing:.12em;color:var(--warn);font-family:var(--mono);margin-bottom:5px;">⚠ RECOVERY MODE ACTIVE</div>
-          <div style="font-size:15px;font-weight:800;margin-bottom:5px;">Welcome back. You've been away.</div>
-          <div style="font-size:12px;color:var(--t2);margin-bottom:12px;" id="recovery-msg">The system has built a lightweight re-entry plan. No need to restart from zero.</div>
-          <div class="brow">
-            <button class="btn btn-warn" onclick="nav('decision')">View Recovery Plan</button>
-            <button class="btn btn-ghost" onclick="dismissRecovery()">Dismiss</button>
-          </div>
-        </div>
-
-        <!-- Confidence Anomaly Banner -->
-        <div class="anomaly-banner" id="anomaly-banner">
-          <div style="color:var(--ink);font-size:13px;margin-top:1px;">⚡</div>
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--ink);margin-bottom:3px;">Confidence Anomaly Detected</div>
-            <div style="font-size:11px;color:var(--t3);" id="anomaly-msg">All answers were suspiciously fast. The system has flagged this test for difficulty adjustment.</div>
-          </div>
-        </div>
-
-        <!-- Decision Panel (computed live) -->
-        <div id="dash-decision-panel"></div>
-
-        <!-- Stats -->
-        <div class="g4" style="margin-bottom:16px;">
-          <div class="card stat"><div class="stat-l">Overall Mastery</div><div class="stat-v" id="stat-mastery" style="color:var(--ink)">—</div><div class="stat-s" id="stat-mastery-s">—</div></div>
-          <div class="card stat"><div class="stat-l">Weak Concepts</div><div class="stat-v" id="stat-weak" style="color:var(--stop)">—</div><div class="stat-s" id="stat-weak-s">—</div></div>
-          <div class="card stat"><div class="stat-l">Tests Taken</div><div class="stat-v" id="stat-tests" style="color:var(--ink)">0</div><div class="stat-s">all time</div></div>
-          <div class="card stat"><div class="stat-l">Revisions Due</div><div class="stat-v" id="stat-due" style="color:var(--stop)">0</div><div class="stat-s">today</div></div>
-        </div>
-
-        <div class="g2">
-          <div class="card">
-            <div class="card-h">Concept health — current topic</div>
-            <div id="dash-concepts"></div>
-          </div>
-          <div class="card">
-            <div class="card-h">Score trend</div>
-            <div class="spark" id="sparkline"></div>
-            <div style="display:flex;justify-content:space-between;margin-top:5px;">
-              <span style="font-size:10px;color:var(--t4);font-family:var(--mono)">oldest</span>
-              <span style="font-size:10px;color:var(--t4);font-family:var(--mono)">latest</span>
-            </div>
-            <div style="margin-top:14px;" class="card-h">Pattern detection</div>
-            <div class="infobox" id="pattern-box">Take a test to see pattern analysis.</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════ TOPICS ══════════════ -->
-      <div id="view-topics" class="view fadein">
-        <div class="page-title">Topics</div>
-        <div class="page-sub">Select a topic to study or test. Topics unlock as prerequisites are mastered.</div>
-        <div class="g3" id="topics-grid"></div>
-      </div>
-
-      <!-- ══════════════ TEST ══════════════ -->
-      <div id="view-test" class="view fadein">
-        <div class="page-title" id="test-title">Adaptive Test</div>
-        <div class="page-sub" id="test-sub">Questions target your weakest concepts. Your time per answer is recorded.</div>
-
-        <!-- Warmup -->
-        <div id="test-warmup" class="card" style="max-width:520px;margin:0 auto;text-align:center;padding:32px;">
-          <div style="font-size:32px;margin-bottom:12px;">🎯</div>
-          <div style="font-size:16px;font-weight:800;margin-bottom:6px;" id="warmup-title">Ready to test yourself?</div>
-          <div style="font-size:12px;color:var(--t3);margin-bottom:20px;line-height:1.6;" id="warmup-desc">This test has 5 questions targeting your weak concepts. Answers are timed — try not to guess.</div>
-          <div class="brow" style="justify-content:center;">
-            <button class="btn btn-ink" onclick="beginTest()">Start Test →</button>
-            <button class="btn btn-ghost" onclick="nav('topics')">Choose Topic</button>
-          </div>
-        </div>
-
-        <!-- Active Test -->
-        <div id="test-active" style="display:none;max-width:600px;">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
-            <div class="progress-dots" id="pdots" style="margin-bottom:0;flex:1;"></div>
-            <div style="font-size:11px;font-family:var(--mono);color:var(--t3);">⏱ <span id="timer-disp">30s</span></div>
-          </div>
-          <div class="timer-strip"><div class="timer-fill" id="timer-fill" style="width:100%"></div></div>
-          <div id="q-render"></div>
-        </div>
-
-        <!-- Result -->
-        <div id="test-result" style="display:none;max-width:600px;">
-          <div id="result-panel"></div>
-        </div>
-      </div>
-
-      <!-- ══════════════ ANALYSIS ══════════════ -->
-      <div id="view-analysis" class="view fadein">
-        <div class="page-title">Performance Analysis</div>
-        <div class="page-sub">Every wrong answer is explained. Not just scored — understood.</div>
-
-        <div id="analysis-empty" class="infobox" style="margin-bottom:16px;">No test completed yet. Take a test to see your full analysis.</div>
-
-        <div id="analysis-content" style="display:none;">
-          <div class="g3" style="margin-bottom:16px;">
-            <div class="card stat"><div class="stat-l">Accuracy</div><div class="stat-v" id="an-acc">—</div><div class="stat-s" id="an-acc-s">—</div></div>
-            <div class="card stat"><div class="stat-l">Avg. Answer Time</div><div class="stat-v" id="an-time" style="color:var(--ink)">—</div><div class="stat-s">threshold varies by difficulty</div></div>
-            <div class="card stat"><div class="stat-l">Error Pattern</div><div class="stat-v" id="an-pattern" style="font-size:13px;font-weight:800;padding-top:4px;">—</div><div class="stat-s" id="an-pattern-s">—</div></div>
-          </div>
-          <div class="card" style="margin-bottom:14px;">
-            <div class="card-h">Answer heat map — hover for concept</div>
-            <div class="hmap" id="hmap"></div>
-            <div style="display:flex;gap:14px;margin-top:10px;flex-wrap:wrap;">
-              <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)"><div style="width:9px;height:9px;border-radius:2px;background:var(--go)"></div>Correct</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)"><div style="width:9px;height:9px;border-radius:2px;background:var(--stop)"></div>Wrong (concept gap)</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)"><div style="width:9px;height:9px;border-radius:2px;background:var(--warn)"></div>Possible guess (fast wrong)</div>
-              <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--t3)"><div style="width:9px;height:9px;border-radius:2px;background:var(--ink)"></div>Anomaly (fast correct)</div>
-            </div>
-          </div>
-          <div class="card-h" style="margin-bottom:8px;">Mistake explanations</div>
-          <div id="mistake-list"></div>
-        </div>
-      </div>
-
-      <!-- ══════════════ DECISION ENGINE ══════════════ -->
-      <div id="view-decision" class="view fadein">
-        <div class="page-title">Decision Engine</div>
-        <div class="page-sub">Live rule-based reasoning. Every decision is traceable — no black boxes.</div>
-        <div id="decision-main"></div>
-        <div class="g2" style="margin-bottom:14px;">
-          <div class="card">
-            <div class="card-h">Decision trace — step by step</div>
-            <div id="decision-trace"></div>
-          </div>
-          <div class="card">
-            <div class="card-h">Difficulty calibration</div>
-            <div id="diff-calib"></div>
-          </div>
-        </div>
-        <div class="card" style="margin-bottom:14px;">
-          <div class="card-h">Active rule set</div>
-          <div id="rules-table"></div>
-        </div>
-      </div>
-
-      <!-- ══════════════ SCHEDULE ══════════════ -->
-      <div id="view-schedule" class="view fadein">
-        <div class="page-title">Revision Schedule</div>
-        <div class="page-sub">Auto-scheduled by mastery confidence. Weak concepts return sooner.</div>
-        <div class="tabs">
-          <div class="tab active" id="stab-today" onclick="schedTab('today',this)">Today</div>
-          <div class="tab" id="stab-week" onclick="schedTab('week',this)">This Week</div>
-          <div class="tab" id="stab-all" onclick="schedTab('all',this)">All</div>
-        </div>
-        <div class="card"><div id="schedule-list"></div></div>
-        <div class="card" style="margin-top:14px;">
-          <div class="card-h">Spacing logic</div>
-          <div class="infobox">
-            <strong style="color:var(--stop)">Weak (&lt;50%)</strong> → Revise next day &nbsp;·&nbsp;
-            <strong style="color:var(--warn)">Moderate (50–74%)</strong> → 2–3 days &nbsp;·&nbsp;
-            <strong style="color:var(--go)">Strong (≥75%)</strong> → 7+ days<br><br>
-            Mastery is updated after every test using a <strong>confidence-weighted Bayesian algorithm</strong> — not flat ±5 points. Early tests carry more weight; later tests fine-tune.
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════ CONCEPT MAP ══════════════ -->
-      <div id="view-concepts" class="view fadein">
-        <div class="page-title">Concept Map</div>
-        <div class="page-sub">Every concept tracked independently. Mastery is per-concept, not per-topic.</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
-          <button class="btn btn-ghost" id="cf-all" onclick="conceptFilter('all')">All</button>
-          <button class="btn btn-ghost" id="cf-weak" onclick="conceptFilter('weak')">Weak</button>
-          <button class="btn btn-ghost" id="cf-moderate" onclick="conceptFilter('moderate')">Moderate</button>
-          <button class="btn btn-ghost" id="cf-strong" onclick="conceptFilter('strong')">Strong</button>
-          <select id="cf-topic" onchange="conceptFilter(null)" style="margin-left:auto;background:var(--bg3);border:1px solid var(--line2);color:var(--t2);border-radius:var(--rs);padding:6px 10px;font-family:var(--sans);font-size:11px;outline:none;">
-            <option value="all">All Topics</option>
-          </select>
-        </div>
-        <div class="card"><div id="concept-list"></div></div>
-      </div>
-
-      <!-- ══════════════ ACTIVITY LOG ══════════════ -->
-      <div id="view-activity" class="view fadein">
-        <div class="page-title">Activity Log</div>
-        <div class="page-sub">Full history of system observations and decisions.</div>
-        <div class="card"><div id="activity-log"></div></div>
-      </div>
-
-    </div><!-- /pane -->
-  </div><!-- /main -->
-</div><!-- /shell -->
-
-<script>
 /* ═══════════════════════════════════════════════════════
    QUESTION BANK — with per-question expected_min_time
    (FIX: guessing detection is per-difficulty, not flat 8s)
@@ -662,12 +80,12 @@ const QUESTION_BANK = {
 };
 
 const TOPICS_META = [
-  { id:"Newton's Laws", icon:"⚡", sub:"Forces, friction, Newton's three laws", prereq:null },
-  { id:"Kinematics", icon:"🎯", sub:"Motion, velocity, acceleration, SUVAT", prereq:null },
-  { id:"Work & Energy", icon:"🔋", sub:"Work, KE, PE, conservation laws", prereq:"Newton's Laws" },
-  { id:"Waves", icon:"〰️", sub:"Sound, EM waves, interference, resonance", prereq:"Work & Energy" },
-  { id:"Thermodynamics", icon:"🌡️", sub:"Heat, entropy, ideal gas laws", prereq:"Work & Energy" },
-  { id:"Optics", icon:"🔭", sub:"Reflection, refraction, lenses", prereq:"Waves" },
+  { id:"Newton's Laws", icon:"", sub:"Forces, friction, Newton's three laws", prereq:null },
+  { id:"Kinematics", icon:"", sub:"Motion, velocity, acceleration, SUVAT", prereq:null },
+  { id:"Work & Energy", icon:"", sub:"Work, KE, PE, conservation laws", prereq:"Newton's Laws" },
+  { id:"Waves", icon:"", sub:"Sound, EM waves, interference, resonance", prereq:"Work & Energy" },
+  { id:"Thermodynamics", icon:"", sub:"Heat, entropy, ideal gas laws", prereq:"Work & Energy" },
+  { id:"Optics", icon:"", sub:"Reflection, refraction, lenses", prereq:"Waves" },
 ];
 
 /* ═══════════════════════════════════════════════════════
@@ -699,6 +117,37 @@ const S = {
   activity: [],
   concept_filter: { level: 'all', topic: 'all' }
 };
+
+/* ═══════════════════════════════════════════════════════
+   INITIALIZE FROM LOCALSTORAGE
+═══════════════════════════════════════════════════════ */
+function initializeFromStorage() {
+  try {
+    const savedState = localStorage.getItem('userProgress');
+    if (savedState) {
+      const saved = JSON.parse(savedState);
+      if (saved.student && saved.student.name && saved.student.name !== 'Student') {
+        // User has already onboarded - restore state
+        Object.assign(S, saved);
+        document.getElementById('onboarding').style.display = 'none';
+        // Initialize UI with restored data
+        document.getElementById('sb-ava').textContent = S.student.name[0].toUpperCase();
+        document.getElementById('sb-name-disp').textContent = S.student.name;
+        document.getElementById('dash-greeting').textContent = `Welcome, ${S.student.name}`;
+        document.getElementById('chip-topic').textContent = `${S.student.subject} — ${S.current_topic}`;
+        // Populate topic filter
+        const tf = document.getElementById('cf-topic');
+        tf.innerHTML = '<option value="all">All Topics</option>';
+        Object.keys(QUESTION_BANK).forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; tf.appendChild(o); });
+        refreshAll();
+        return true;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading saved state:', e);
+  }
+  return false;
+}
 
 /* ═══════════════════════════════════════════════════════
    BAYESIAN MASTERY UPDATE
@@ -805,12 +254,14 @@ function startSystem() {
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('sb-ava').textContent = name[0].toUpperCase();
   document.getElementById('sb-name-disp').textContent = name;
-  document.getElementById('dash-greeting').textContent = `Welcome, ${name} 👋`;
+  document.getElementById('dash-greeting').textContent = `Welcome, ${name}`;
   document.getElementById('chip-topic').textContent = `${subject} — ${S.current_topic}`;
   // Populate topic filter
   const tf = document.getElementById('cf-topic');
   tf.innerHTML = '<option value="all">All Topics</option>';
   Object.keys(QUESTION_BANK).forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; tf.appendChild(o); });
+  // Save state to localStorage
+  localStorage.setItem('userProgress', JSON.stringify(S));
   refreshAll();
   logActivity('start', `System initialized for ${name} — ${subject}, ${level} level.`, 'var(--ink)');
 }
@@ -858,7 +309,7 @@ function renderDashboard() {
   document.getElementById('stat-due').textContent = dueToday;
   document.getElementById('chip-mastery').textContent = `Mastery: ${allAvg}%`;
   document.getElementById('chip-streak').textContent = `Day ${S.student.streak}`;
-  document.getElementById('sb-streak').textContent = `🔥 ${S.student.streak} day streak`;
+  document.getElementById('sb-streak').textContent = `${S.student.streak} day streak`;
   document.getElementById('nb-schedule').textContent = dueToday;
 
   // Decision panel
@@ -1104,7 +555,7 @@ function finishTest() {
     <div class="decision-panel ${resultColor}">
       <div class="dp-tag ${acc>=80?'go':acc>=60?'amber':'stop'}">Test Complete</div>
       <div class="dp-headline">${acc}% — ${d2.headline}</div>
-      <div class="dp-reason">${correct}/${total} correct · Avg. time: ${avgTime}s · Pattern: ${p.label}<br>${d2.reason}${allFastCorrect?' ⚡ Note: All answers were very fast — system has flagged for difficulty review.':''}</div>
+      <div class="dp-reason">${correct}/${total} correct · Avg. time: ${avgTime}s · Pattern: ${p.label}<br>${d2.reason}${allFastCorrect?' Note: All answers were very fast — system has flagged for difficulty review.':''}</div>
       <div class="brow">
         <button class="btn btn-ink" onclick="nav('analysis')">Full Analysis →</button>
         <button class="btn btn-ghost" onclick="initTestView()">Retry</button>
@@ -1136,7 +587,7 @@ function renderAnalysis() {
   const hm = document.getElementById('hmap');
   hm.innerHTML = lt.answers.map((a,i) => {
     let bg, color, icon;
-    if (a.classification==='fast_correct') { bg='var(--inkglow)'; color='var(--ink)'; icon='⚡'; }
+    if (a.classification==='fast_correct') { bg='var(--inkglow)'; color='var(--ink)'; icon=''; }
     else if (a.correct) { bg='var(--go2)'; color='var(--go)'; icon='✓'; }
     else if (a.classification==='guess') { bg='var(--warn2)'; color='var(--warn)'; icon='?'; }
     else { bg='var(--stop2)'; color='var(--stop)'; icon='✗'; }
@@ -1148,13 +599,13 @@ function renderAnalysis() {
   const wrong = lt.answers.filter(a=>!a.correct);
   const correct = lt.answers.filter(a=>a.correct);
   if (correct.length) {
-    ml.innerHTML = correct.map(a=>`<div class="correct-row">✓ Q${a.qid+1}: ${a.concept} — correct in ${a.time}s${a.classification==='fast_correct'?' ⚡':''}
+    ml.innerHTML = correct.map(a=>`<div class="correct-row">✓ Q${a.qid+1}: ${a.concept} — correct in ${a.time}s${a.classification==='fast_correct'?'':''}
     </div>`).join('');
   }
   if (!wrong.length) { ml.innerHTML += `<div class="infobox" style="color:var(--go)">Perfect score! No mistakes to analyze.</div>`; return; }
   ml.innerHTML += wrong.map(a=>{
     const tagClass = a.classification==='guess'?'guess':a.classification==='timeout'?'calc':'concept';
-    const tagLabel = a.classification==='guess'?'⚡ Likely Guess (too fast)':a.classification==='timeout'?'⏱ Timeout (ran out of time)':'🔍 Concept Gap';
+    const tagLabel = a.classification==='guess'?'Likely Guess (too fast)':a.classification==='timeout'?'Timeout (ran out of time)':'Concept Gap';
     return `<div class="mistake-card">
       <div class="q-meta">
         <div class="q-con">${a.concept}</div>
@@ -1348,6 +799,3 @@ function refreshAll() {
   renderDashboard();
   refreshTopbar();
 }
-</script>
-</body>
-</html>

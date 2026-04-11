@@ -80,8 +80,8 @@ const QUESTION_BANK = {
 };
 
 const TOPICS_META = [
-  { id:"Newton's Laws", icon:"⚡", sub:"Forces, friction, Newton's three laws", prereq:null },
-  { id:"Kinematics", icon:"🎯", sub:"Motion, velocity, acceleration, SUVAT", prereq:null },
+  { id:"Newton's Laws", icon:"", sub:"Forces, friction, Newton's three laws", prereq:null },
+  { id:"Kinematics", icon:"", sub:"Motion, velocity, acceleration, SUVAT", prereq:null },
   { id:"Work & Energy", icon:"🔋", sub:"Work, KE, PE, conservation laws", prereq:"Newton's Laws" },
   { id:"Waves", icon:"〰️", sub:"Sound, EM waves, interference, resonance", prereq:"Work & Energy" },
   { id:"Thermodynamics", icon:"🌡️", sub:"Heat, entropy, ideal gas laws", prereq:"Work & Energy" },
@@ -223,7 +223,7 @@ function startSystem() {
   document.getElementById('onboarding').style.display = 'none';
   document.getElementById('sb-ava').textContent = name[0].toUpperCase();
   document.getElementById('sb-name-disp').textContent = name;
-  document.getElementById('dash-greeting').textContent = `Welcome, ${name} 👋`;
+  document.getElementById('dash-greeting').textContent = `Welcome, ${name}`;
   document.getElementById('chip-topic').textContent = `${subject} — ${S.current_topic}`;
   // Populate topic filter
   const tf = document.getElementById('cf-topic');
@@ -276,7 +276,7 @@ function renderDashboard() {
   document.getElementById('stat-due').textContent = dueToday;
   document.getElementById('chip-mastery').textContent = `Mastery: ${allAvg}%`;
   document.getElementById('chip-streak').textContent = `Day ${S.student.streak}`;
-  document.getElementById('sb-streak').textContent = `🔥 ${S.student.streak} day streak`;
+  document.getElementById('sb-streak').textContent = `${S.student.streak} day streak`;
   document.getElementById('nb-schedule').textContent = dueToday;
 
   // Decision panel

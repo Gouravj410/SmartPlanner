@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login — SmartPlanner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg0: #07080d; --bg1: #0d0f18; --bg2: #131620; --bg3: #1a1d2b;
+      --line: rgba(255,255,255,0.06); --line2: rgba(255,255,255,0.11);
+      --t1: #f0eeff; --t2: #9896b8; --t3: #55536e;
+      --ink: #7b6ff0; --ink2: #5a4fd6; --inkglow: rgba(123,111,240,0.12);
+      --stop: #f05a7b; --stop2: rgba(240,90,123,0.1);
+      --r: 10px; --rs: 7px;
+      --mono: 'JetBrains Mono', monospace; --sans: 'Plus Jakarta Sans', sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg0); color: var(--t1); font-family: var(--sans); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .auth-container { width: 100%; max-width: 420px; }
+    .auth-card { background: var(--bg1); border: 1px solid var(--line); border-radius: var(--r); padding: 40px 32px; }
+    .auth-header { margin-bottom: 32px; text-align: center; }
+    .auth-logo { font-size: 9px; font-weight: 700; color: var(--ink); font-family: var(--mono); margin-bottom: 12px; }
+    .auth-title { font-size: 28px; font-weight: 800; margin-bottom: 8px; }
+    .auth-subtitle { font-size: 13px; color: var(--t2); line-height: 1.5; }
+    .form-group { margin-bottom: 18px; }
+    .form-label { display: block; font-size: 12px; font-weight: 600; color: var(--t2); margin-bottom: 6px; font-family: var(--mono); }
+    .form-input { width: 100%; padding: 11px 14px; background: var(--bg3); border: 1px solid var(--line2); border-radius: var(--rs); color: var(--t1); font-size: 13px; outline: none; }
+    .form-input:focus { border-color: var(--ink); background: var(--bg2); box-shadow: 0 0 0 3px rgba(123,111,240,0.1); }
+    .form-error { font-size: 11px; color: var(--stop); margin-top: 4px; display: none; }
+    .form-error.show { display: block; }
+    .form-options { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; font-size: 12px; }
+    .form-options a { color: var(--ink); text-decoration: none; }
+    .form-options a:hover { color: var(--ink2); }
+    .btn { padding: 12px 16px; border-radius: var(--rs); border: none; font-weight: 600; font-size: 13px; cursor: pointer; font-family: var(--sans); width: 100%; text-align: center; }
+    .btn-primary { background: var(--ink); color: #fff; }
+    .btn-primary:hover { background: var(--ink2); }
+    .btn-primary:active { transform: scale(0.99); }
+    .auth-footer { text-align: center; margin-top: 24px; font-size: 13px; color: var(--t2); }
+    .auth-footer a { color: var(--ink); text-decoration: none; font-weight: 600; }
+    .error-banner { background: var(--stop2); border: 1px solid var(--stop); border-radius: var(--rs); padding: 12px 14px; color: var(--stop); font-size: 12px; margin-bottom: 16px; display: none; }
+    .error-banner.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-header">
+        <div class="auth-logo">SmartPlanner</div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to continue your learning journey.</p>
+      </div>
+
+      <div class="error-banner" id="errorBanner"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="email" placeholder="Enter your email" required>
+          <div class="form-error" id="emailError"></div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" id="password" placeholder="••••••••" required>
+          <div class="form-error" id="passwordError"></div>
+        </div>
+
+        <div class="form-options">
+          <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+            <input type="checkbox" id="rememberMe" style="cursor: pointer;">
+            <span>Remember me</span>
+          </label>
+          <a href="#forgot">Forgot password?</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Sign In</button>
+      </form>
+
+      <div class="auth-footer">
+        Don't have an account? <a href="register.html">Create one</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script>
+    // Check if already logged in
+    if (APIService.isAuthenticated()) {
+      window.location.href = 'index.html';
+    }
+
+    async function handleLogin(event) {
+      event.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      clearErrors();
+
+      try {
+        await APIService.login(email, password);
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 500);
+      } catch (error) {
+        showErrorBanner(error.message);
+      }
+    }
+
+    function showErrorBanner(message) {
+      const errorBanner = document.getElementById('errorBanner');
+      errorBanner.textContent = '✕ ' + message;
+      errorBanner.classList.add('show');
+    }
+
+    function clearErrors() {
+      document.getElementById('errorBanner').classList.remove('show');
+    }
+  </script>
+</body>
+</html>
